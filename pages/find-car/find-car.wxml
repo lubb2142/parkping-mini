@@ -1,0 +1,66 @@
+<view class="page">
+  <view wx:if="{{ record }}" class="card find-hero">
+    <view class="section-title">开始找车</view>
+    <view class="find-title">{{ record.mallName || record.garageName || '未命名停车点' }}</view>
+    <view class="find-subtitle">{{ record.floor }} · {{ record.parkingCode || '未填写车位号' }}</view>
+
+    <view class="stat-grid">
+      <view class="stat-card">
+        <view class="stat-label">当前距离</view>
+        <view class="stat-value">{{ distanceText || '未知' }}</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-label">车牌号</view>
+        <view class="stat-value">{{ record.licensePlate || '未填写' }}</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-label">记录时间</view>
+        <view class="stat-value small">{{ record.timeText }}</view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn-primary" bindtap="navigateToParking">直接去车位</button>
+      <button class="btn-secondary" bindtap="navigateToElevator">先去电梯</button>
+      <button class="btn-ghost" bindtap="useAsCurrent">设为当前记录</button>
+    </view>
+  </view>
+
+  <view wx:if="{{ record }}" class="card">
+    <view class="section-title">找车步骤</view>
+    <view wx:for="{{ guideSteps }}" wx:key="title" class="guide-step">
+      <view class="guide-index">{{ index + 1 }}</view>
+      <view class="guide-content">
+        <view class="guide-title">{{ item.title }}</view>
+        <view class="guide-desc">{{ item.desc }}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{ record }}" class="card">
+    <view class="section-title">室内线索</view>
+    <view class="meta-list">
+      <view class="meta-item">入口提示：{{ record.entranceNote || '未填写' }}</view>
+      <view class="meta-item">电梯提示：{{ record.elevatorNote || '未填写' }}</view>
+      <view class="meta-item">柱号 / 标识：{{ record.pillarCode || '未填写' }}</view>
+      <view class="meta-item">补充说明：{{ record.remark || '未填写' }}</view>
+    </view>
+  </view>
+
+  <block wx:if="{{ record }}">
+    <view wx:for="{{ photoSections }}" wx:key="title" class="card">
+      <view class="section-title">{{ item.title }}</view>
+      <view class="photo-grid">
+        <view wx:for="{{ item.photos }}" wx:for-item="photo" wx:key="id" class="photo-card">
+          <image class="photo-image" src="{{ photo.filePath }}" mode="aspectFill" bindtap="previewSectionPhoto" data-path="{{ photo.filePath }}"></image>
+          <view class="photo-badge">{{ photo.label }}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{ !record && !loading }}" class="card">
+    <view class="section-title">还没有可找的车位</view>
+    <view class="hint">先回首页记录一次停车位置，这里才会出现完整的找车流程。</view>
+  </view>
+</view>
