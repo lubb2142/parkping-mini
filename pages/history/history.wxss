@@ -1,0 +1,19 @@
+.record-card {
+  border: 2rpx solid #e2e8f0;
+}
+
+.record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18rpx;
+}
+
+.record-time {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.history-actions {
+  margin-top: 20rpx;
+}
