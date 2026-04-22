@@ -1,0 +1,9 @@
+{
+  "desc": "停车找车助手 sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}
