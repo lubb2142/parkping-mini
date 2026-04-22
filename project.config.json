@@ -1,0 +1,23 @@
+{
+  "description": "停车找车助手微信小程序原型",
+  "packOptions": {
+    "ignore": []
+  },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "minifyWXML": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.6.3",
+  "appid": "touristappid",
+  "projectname": "parking-finder-miniapp",
+  "condition": {}
+}
