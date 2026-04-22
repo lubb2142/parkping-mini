@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/history/history",
+    "pages/find-car/find-car"
+  ],
+  "window": {
+    "navigationBarTitleText": "停车找车助手",
+    "navigationBarBackgroundColor": "#0f172a",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f3f4f6",
+    "backgroundTextStyle": "light"
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于记录停车位置和找车导航"
+    }
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
