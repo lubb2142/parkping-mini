@@ -1,0 +1,196 @@
+<view class="page">
+  <view class="hero card">
+    <view class="hero-top">
+      <view>
+        <view class="hero-title">停车后点一下，找车时直接导航</view>
+        <view class="hero-subtitle">现在除了楼层和电梯，也能保存商场名、入口、柱号和现场照片，回忆现场会轻松很多。</view>
+      </view>
+      <view>
+        <view class="pill">{{ locationStatusText }}</view>
+        <view class="cloud-pill">{{ cloudStatusText }}</view>
+      </view>
+    </view>
+
+    <view class="stat-grid">
+      <view class="stat-card">
+        <view class="stat-label">当前能力</view>
+        <view class="stat-value">导航找车</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-label">室内辅助</view>
+        <view class="stat-value">电梯 + 入口</view>
+      </view>
+      <view class="stat-card">
+        <view class="stat-label">记忆锚点</view>
+        <view class="stat-value">照片保存</view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn-primary" bindtap="refreshLocation">刷新我的位置</button>
+      <button class="btn-ghost" bindtap="useCurrentForParking">当前位置设为车位</button>
+      <button class="btn-ghost" bindtap="useCurrentForElevator">当前位置设为电梯</button>
+    </view>
+
+    <view class="hint">
+      地下车库 GPS 可能不稳定。你可以先在入口附近记录，再通过地图点选微调车位和电梯位置。
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">地图校正</view>
+    <map
+      id="parking-map"
+      class="parking-map"
+      longitude="{{ mapLongitude }}"
+      latitude="{{ mapLatitude }}"
+      scale="18"
+      markers="{{ markers }}"
+      show-location="true"
+      bindtap="handleMapTap"
+    ></map>
+
+    <view class="mode-row">
+      <button class="btn-secondary mode-btn {{ draftMode === 'parking' ? 'active' : '' }}" bindtap="setDraftMode" data-mode="parking">点地图设置车位</button>
+      <button class="btn-secondary mode-btn {{ draftMode === 'elevator' ? 'active' : '' }}" bindtap="setDraftMode" data-mode="elevator">点地图设置电梯</button>
+    </view>
+
+    <view class="hint">
+      当前模式：{{ draftModeText }}。点击地图后会更新对应标记。
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">车牌找车</view>
+    <view class="field">
+      <text class="label">常用车牌号</text>
+      <input class="input" placeholder="例如 沪A12345 或 粤B88888" value="{{ licensePlate }}" bindinput="handleLicensePlateInput" />
+    </view>
+    <view class="btn-row">
+      <button class="btn-secondary" bindtap="tryPlateSearch">尝试按车牌找车</button>
+      <button class="btn-ghost" bindtap="syncFromCloud" loading="{{ cloudSyncing }}">手动同步云端</button>
+    </view>
+    <view class="hint">
+      这类能力不是通用地图能力，只有停车场自己开放了数据接口，才能自动查到具体车位。
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">停车信息</view>
+
+    <view class="grid-2">
+      <view class="field">
+        <text class="label">商场 / 目的地</text>
+        <input class="input" placeholder="例如 万象城 / 国金中心" value="{{ mallName }}" bindinput="handleMallNameInput" />
+      </view>
+
+      <view class="field">
+        <text class="label">停车场名称</text>
+        <input class="input" placeholder="例如 北区停车场 / 地库二期" value="{{ garageName }}" bindinput="handleGarageNameInput" />
+      </view>
+    </view>
+
+    <view class="grid-2">
+      <view class="field">
+        <text class="label">停车楼层</text>
+        <picker class="picker" mode="selector" range="{{ floorOptions }}" value="{{ floorIndex }}" bindchange="handleFloorChange">
+          <view class="picker">{{ floorOptions[floorIndex] }}</view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label">入口 / 出入口提示</text>
+        <input class="input" placeholder="例如 2 号门下行口" value="{{ entranceNote }}" bindinput="handleEntranceNoteInput" />
+      </view>
+    </view>
+
+    <view class="grid-2">
+      <view class="field">
+        <text class="label">车位区域 / 车位号</text>
+        <input class="input" placeholder="例如 B2-A区-028" value="{{ parkingCode }}" bindinput="handleParkingCodeInput" />
+      </view>
+
+      <view class="field">
+        <text class="label">柱号 / 标识</text>
+        <input class="input" placeholder="例如 C3 柱 / 蓝色区域" value="{{ pillarCode }}" bindinput="handlePillarCodeInput" />
+      </view>
+    </view>
+
+    <view class="field">
+      <text class="label">本次停车车牌号</text>
+      <input class="input" placeholder="例如 沪A12345" value="{{ licensePlate }}" bindinput="handleLicensePlateInput" />
+    </view>
+
+    <view class="field">
+      <text class="label">电梯备注</text>
+      <input class="input" placeholder="例如 靠近 3 号电梯 / 星巴克入口旁" value="{{ elevatorNote }}" bindinput="handleElevatorNoteInput" />
+    </view>
+
+    <view class="field">
+      <text class="label">补充说明</text>
+      <textarea class="textarea" placeholder="例如 柱子写着 C 区、旁边有母婴车位" value="{{ remark }}" bindinput="handleRemarkInput"></textarea>
+    </view>
+
+    <view class="field">
+      <text class="label">现场照片</text>
+      <view class="btn-row">
+        <button class="btn-ghost" bindtap="addPhoto" data-type="car">拍/选车位照片</button>
+        <button class="btn-ghost" bindtap="addPhoto" data-type="entrance">拍/选入口照片</button>
+        <button class="btn-ghost" bindtap="addPhoto" data-type="pillar">拍/选柱号照片</button>
+      </view>
+      <view class="hint">建议至少拍 1 张：车位牌、柱号、最近的电梯或入口，找车时特别有帮助。</view>
+    </view>
+
+    <view wx:if="{{ draftPhotos.length }}" class="photo-grid">
+      <view wx:for="{{ draftPhotos }}" wx:key="id" class="photo-card">
+        <image class="photo-image" src="{{ item.filePath }}" mode="aspectFill" bindtap="previewDraftPhoto" data-path="{{ item.filePath }}"></image>
+        <view class="photo-badge">{{ item.label }}</view>
+        <view class="photo-remove" bindtap="removeDraftPhoto" data-id="{{ item.id }}">×</view>
+      </view>
+    </view>
+
+    <view class="btn-row">
+      <button class="btn-primary" bindtap="saveParkingRecord">停车并记录位置</button>
+      <button class="btn-ghost" bindtap="goHistory">查看历史记录</button>
+    </view>
+  </view>
+
+  <view wx:if="{{ activeRecord }}" class="card saved-card">
+    <view class="saved-head">
+      <view>
+        <view class="section-title">当前已保存车位</view>
+        <view class="muted">{{ activeRecord.summaryTitle }}</view>
+      </view>
+      <view class="pill">{{ activeRecord.floor }}</view>
+    </view>
+
+    <view class="meta-list">
+      <view class="meta-item">记录时间：{{ activeRecord.timeText }}</view>
+      <view class="meta-item">停车场：{{ activeRecord.garageName || '未填写' }}</view>
+      <view class="meta-item">车牌号：{{ activeRecord.licensePlate || '未填写' }}</view>
+      <view class="meta-item">入口提示：{{ activeRecord.entranceNote || '未填写' }}</view>
+      <view class="meta-item">柱号 / 标识：{{ activeRecord.pillarCode || '未填写' }}</view>
+      <view class="meta-item">车位信息：{{ activeRecord.parkingCode || '未填写' }}</view>
+      <view class="meta-item">停车坐标：{{ activeRecord.parking.latitude }}, {{ activeRecord.parking.longitude }}</view>
+      <view class="meta-item">电梯提示：{{ activeRecord.elevatorNote || '未填写' }}</view>
+      <view wx:if="{{ activeRecord.elevator }}" class="meta-item">电梯坐标：{{ activeRecord.elevator.latitude }}, {{ activeRecord.elevator.longitude }}</view>
+      <view class="meta-item">补充说明：{{ activeRecord.remark || '未填写' }}</view>
+      <view class="meta-item">照片数量：{{ activeRecord.photoCountText }}</view>
+      <view wx:if="{{ distanceText }}" class="meta-item">我距离车位：{{ distanceText }}</view>
+    </view>
+
+    <view wx:if="{{ activeRecord.photos.length }}" class="photo-grid">
+      <view wx:for="{{ activeRecord.photos }}" wx:key="id" class="photo-card">
+        <image class="photo-image" src="{{ item.filePath }}" mode="aspectFill" bindtap="previewSavedPhoto" data-path="{{ item.filePath }}"></image>
+        <view class="photo-badge">{{ item.label }}</view>
+      </view>
+    </view>
+
+    <view class="btn-row saved-actions">
+      <button class="btn-secondary" bindtap="goFindCar">开始找车</button>
+      <button class="btn-primary" bindtap="navigateToParking">导航去找车</button>
+      <button wx:if="{{ activeRecord.elevator }}" class="btn-secondary" bindtap="navigateToElevator">先导航到电梯</button>
+      <button class="btn-danger" bindtap="clearActiveRecord">清除当前车位</button>
+    </view>
+  </view>
+</view>
