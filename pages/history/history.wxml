@@ -1,0 +1,48 @@
+<view class="page">
+  <view class="card">
+    <view class="section-title">最近记录</view>
+    <view class="hint">默认保留最近 20 条，方便你在不同商场和停车场之间切换查看。</view>
+  </view>
+
+  <block wx:if="{{ records.length }}">
+    <view wx:for="{{ records }}" wx:key="id" class="card record-card">
+      <view class="record-top">
+        <view>
+          <view class="record-time">{{ item.timeText }}</view>
+          <view class="muted">{{ item.summaryTitle }}</view>
+        </view>
+        <view class="pill">{{ item.floor }}</view>
+      </view>
+
+      <view class="meta-list">
+        <view class="meta-item">停车场：{{ item.garageName || '未填写' }}</view>
+        <view class="meta-item">车牌号：{{ item.licensePlate || '未填写' }}</view>
+        <view class="meta-item">入口提示：{{ item.entranceNote || '未填写' }}</view>
+        <view class="meta-item">柱号 / 标识：{{ item.pillarCode || '未填写' }}</view>
+        <view class="meta-item">车位信息：{{ item.parkingCode || '未填写' }}</view>
+        <view class="meta-item">电梯提示：{{ item.elevatorNote || '未填写' }}</view>
+        <view class="meta-item">照片数量：{{ item.photoCountText }}</view>
+        <view class="meta-item">补充说明：{{ item.remark || '未填写' }}</view>
+      </view>
+
+      <view wx:if="{{ item.photos.length }}" class="photo-grid">
+        <view wx:for="{{ item.photos }}" wx:for-item="photo" wx:key="id" class="photo-card">
+          <image class="photo-image" src="{{ item.filePath }}" mode="aspectFill"></image>
+          <view class="photo-badge">{{ item.label }}</view>
+        </view>
+      </view>
+
+      <view class="btn-row history-actions">
+        <button class="btn-primary" bindtap="reuseRecord" data-id="{{ item.id }}">设为当前车位</button>
+        <button class="btn-ghost" bindtap="goFindCar" data-id="{{ item.id }}">开始找车</button>
+        <button class="btn-secondary" bindtap="goParking" data-id="{{ item.id }}">导航去车位</button>
+        <button class="btn-danger" bindtap="removeRecord" data-id="{{ item.id }}">删除</button>
+      </view>
+    </view>
+  </block>
+
+  <view wx:else class="card">
+    <view class="section-title">还没有历史记录</view>
+    <view class="hint">回到首页，记录一次停车位置后，这里就会显示。</view>
+  </view>
+</view>
